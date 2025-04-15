@@ -2,43 +2,57 @@
 <html>
 <head>
     <title>抓不到的娃娃</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
         #game-container {
-            width: 500px;
-            height: 500px;
+            width: 90%; /* 改为百分比宽度，适配不同屏幕 */
+            max-width: 500px; /* 限制最大宽度 */
+            height: 90vw; /* 高度设置为视口宽度的比例，适配正方形 */
+            max-height: 500px; /* 限制最大高度 */
             position: relative;
             border: 2px solid #333;
             margin: 20px auto;
             background-color: #f0f0f0;
+            border-radius: 10px; /* 增加圆角，优化视觉效果 */
+            overflow: hidden;
         }
 
         #doll {
-            width: 60px;
-            height: 60px;
+            width: 15vw; /* 改为相对宽度，适配不同屏幕 */
+            max-width: 60px; /* 限制最大宽度 */
+            height: 15vw; /* 改为相对高度，适配不同屏幕 */
+            max-height: 60px; /* 限制最大高度 */
             position: absolute;
             background-color: #ff4081;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: flex; /* 使用 flexbox 布局 */
-            justify-content: center; /* 水平居中 */
-            align-items: center; /* 垂直居中 */
-            color: white; /* 文字颜色 */
-            font-size: 14px; /* 文字大小 */
-            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 3.5vw; /* 文字大小适配屏幕 */
+            user-select: none; /* 禁止选中文字 */
         }
 
         #counter {
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-size: 4vw; /* 文字大小适配屏幕 */
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div id="counter">抓海宁，抓到: <span id="attempts">0</span>次</div>
     <div id="game-container">
-        <div id="doll">海宁</div> <!-- 在圆球上添加文字 -->
+        <div id="doll">海宁</div>
     </div>
 
     <script>
@@ -52,12 +66,15 @@
         // 自动移动定时器
         setInterval(moveDoll, 2000);
 
-        // 点击事件处理
-        doll.addEventListener('mousedown', function() {
+        // 点击事件处理（适配触摸屏）
+        function handleClickOrTouch() {
             attempts++;
             attemptsSpan.textContent = attempts;
             moveDoll();
-        });
+        }
+
+        doll.addEventListener('mousedown', handleClickOrTouch); // 鼠标点击
+        doll.addEventListener('touchstart', handleClickOrTouch); // 触摸开始
 
         function moveDoll() {
             const container = document.getElementById('game-container');
@@ -76,15 +93,15 @@
             doll.style.top = newY + 'px';
         }
 
-        // 增加难度：鼠标跟随
-        document.addEventListener('mousemove', (e) => {
+        // 增加难度：鼠标/手指跟随（适配触摸屏）
+        function handleMouseOrTouchMove(e) {
             const dollRect = doll.getBoundingClientRect();
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
+            const mouseX = e.clientX || e.touches[0].clientX; // 兼容鼠标和触摸事件
+            const mouseY = e.clientY || e.touches[0].clientY;
             
             // 计算娃娃中心坐标
-            const dollCenterX = dollRect.left + dollRect.width/2;
-            const dollCenterY = dollRect.top + dollRect.height/2;
+            const dollCenterX = dollRect.left + dollRect.width / 2;
+            const dollCenterY = dollRect.top + dollRect.height / 2;
             
             // 计算距离
             const distance = Math.sqrt(
@@ -92,11 +109,14 @@
                 Math.pow(mouseY - dollCenterY, 2)
             );
 
-            // 当鼠标靠近时加速移动
+            // 当鼠标/手指靠近时加速移动
             if (distance < 200) {
                 moveDoll();
             }
-        });
+        }
+
+        document.addEventListener('mousemove', handleMouseOrTouchMove); // 鼠标移动
+        document.addEventListener('touchmove', handleMouseOrTouchMove); // 触摸移动
     </script>
 </body>
 </html>
