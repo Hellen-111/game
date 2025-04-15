@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>抓不到的娃娃</title>
+    <style>
+        #game-container {
+            width: 500px;
+            height: 500px;
+            position: relative;
+            border: 2px solid #333;
+            margin: 20px auto;
+            background-color: #f0f0f0;
+        }
+
+        #doll {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+            background-color: #ff4081;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex; /* 使用 flexbox 布局 */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            color: white; /* 文字颜色 */
+            font-size: 14px; /* 文字大小 */
+            font-family: Arial, sans-serif;
+        }
+
+        #counter {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="counter">抓海宁，抓到: <span id="attempts">0</span>次</div>
+    <div id="game-container">
+        <div id="doll">海宁</div> <!-- 在圆球上添加文字 -->
+    </div>
+
+    <script>
+        const doll = document.getElementById('doll');
+        const attemptsSpan = document.getElementById('attempts');
+        let attempts = 0;
+
+        // 初始随机位置
+        moveDoll();
+
+        // 自动移动定时器
+        setInterval(moveDoll, 2000);
+
+        // 点击事件处理
+        doll.addEventListener('mousedown', function() {
+            attempts++;
+            attemptsSpan.textContent = attempts;
+            moveDoll();
+        });
+
+        function moveDoll() {
+            const container = document.getElementById('game-container');
+            const containerRect = container.getBoundingClientRect();
+            
+            // 计算有效移动范围
+            const maxX = containerRect.width - doll.offsetWidth;
+            const maxY = containerRect.height - doll.offsetHeight;
+            
+            // 生成随机位置
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+            
+            // 应用新位置
+            doll.style.left = newX + 'px';
+            doll.style.top = newY + 'px';
+        }
+
+        // 增加难度：鼠标跟随
+        document.addEventListener('mousemove', (e) => {
+            const dollRect = doll.getBoundingClientRect();
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // 计算娃娃中心坐标
+            const dollCenterX = dollRect.left + dollRect.width/2;
+            const dollCenterY = dollRect.top + dollRect.height/2;
+            
+            // 计算距离
+            const distance = Math.sqrt(
+                Math.pow(mouseX - dollCenterX, 2) + 
+                Math.pow(mouseY - dollCenterY, 2)
+            );
+
+            // 当鼠标靠近时加速移动
+            if (distance < 200) {
+                moveDoll();
+            }
+        });
+    </script>
+</body>
+</html>
